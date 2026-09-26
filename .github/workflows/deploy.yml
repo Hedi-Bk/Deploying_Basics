@@ -1,0 +1,59 @@
+# ============================================================
+# WORKFLOW GITHUB ACTIONS — Build & Push Docker Image
+# ============================================================
+# Ce fichier décrit UN pipeline qui sera exécuté par GitHub.
+# Il s'exécute automatiquement à chaque "git push" sur la branche main.
+# ============================================================
+
+name: Build and Push FastAPI Image # nom visible dans l'onglet Actions
+
+# ------------------------------------------------------------
+# QUAND déclencher ce workflow ?
+# ------------------------------------------------------------
+on:
+  push:
+    branches: [main] # déclenche sur push vers main
+  workflow_dispatch: # permet aussi de le lancer manuellement
+
+# ------------------------------------------------------------
+# QUOI exécuter ?
+# ------------------------------------------------------------
+jobs:
+  # Nom du job (libre, tu peux l'appeler comme tu veux)
+  build-and-push:
+    # Sur quelle machine virtuelle exécuter ?
+    runs-on: ubuntu-latest
+
+    # Liste des étapes du job (exécutées dans l'ordre)
+    steps:
+      # ------------------------------------------------------
+      # Étape 1 : Récupérer le code du dépôt
+      # ------------------------------------------------------
+      # Sans cette étape, le runner ne connaît pas ton code.
+      # actions/checkout est une action officielle GitHub.
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------
+      # Étape 2 : Se connecter à Docker Hub
+      # ------------------------------------------------------
+      # Utilise les secrets configurés dans GitHub
+      # pour s'authentifier auprès de Docker Hub.
+      - name: 🔐 Login à Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # ------------------------------------------------------
+      # Étape 3 : Construire et pousser l'image Docker
+      # ------------------------------------------------------
+      # Cette action combine "docker build" + "docker push".
+      # Le tag "latest" est mis à jour à chaque push.
+      - name: 🐳 Build et push de l'image
+        uses: docker/build-push-action@v5
+        with:
+          context: . # dossier contenant le Dockerfile
+          file: ./Dockerfile # chemin du Dockerfile
+          push: true # on veut pousser l'image
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
