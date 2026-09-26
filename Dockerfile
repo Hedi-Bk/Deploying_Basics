@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8000
 
 # 7. Commande de démarrage en production
-CMD ["uvicorn", "2_fatapi_Server_client:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn 2_fatapi_Server_client:app --host 0.0.0.0 --port ${PORT:-8000}
