@@ -52,8 +52,8 @@ def hello():
     print("📥 [SERVEUR] Requête reçue sur GET /hello")
 
     # FastAPI convertira ce dict en {"message": "bonjour"}
-    reponse = {"message": "bonjour"}
-
+    reponse = {"message": "bonjour depuis Render !"} 
+    
     print(f"📤 [SERVEUR] Réponse envoyée : {reponse}")
     return reponse
 
